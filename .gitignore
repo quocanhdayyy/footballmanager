@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+data/
+data_backup/
+.venv/
+.idea/
+.env
+research/.env
+AGENTS.md
+.claude/
