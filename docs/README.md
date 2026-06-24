@@ -5,10 +5,10 @@
 [![PuLP](https://img.shields.io/badge/PuLP-MILP%20%2B%20RHC-yellow.svg)](https://coin-or.github.io/pulp/)
 [![Schedule](https://img.shields.io/badge/GitHub_Actions-2%C3%97daily-lightgrey.svg)](../.github/workflows/pipeline.yml)
 
-Data-driven agent. Picks + manages 15-player FPL squad. Pipeline: quantile-regression boosting for per-position point distributions; two-stage minutes head with cup-congestion rotation signal; independent Poisson for match goals; MILP for squad + XI + captain over rolling horizon; greedy + alt-solve chip scheduling. Data: [olbauday/FPL-Core-Insights](https://github.com/olbauday/FPL-Core-Insights) CSVs (FPL API + Opta + ClubElo + EFL/UEFA cup fixtures, 2×/day) + live FPL API overlay for prices + injuries.
+Agent dự đoán và quản lý đội hình FPL tự động dựa trên dữ liệu. Chọn + quản lý squad 15 cầu thủ. Pipeline gồm: hồi quy quantile bằng boosting để dự đoán phân phối điểm theo vị trí; mô hình hai giai đoạn dự đoán số phút với tín hiệu xoay tua cup; Poisson độc lập cho bàn thắng trận đấu; MILP tối ưu squad + XI + đội trưởng theo rolling horizon; lên lịch chip bằng greedy + alt-solve. Dữ liệu từ [olbauday/FPL-Core-Insights](https://github.com/olbauday/FPL-Core-Insights) (FPL API + Opta + ClubElo + lịch EFL/UEFA cup, 2 lần/ngày) + live FPL API để cập nhật giá và chấn thương.
 
-> **New to FPL?** See [FPL 101 primer](FPL_101.md).
-> **Scope:** Research / personal.
+> **Mới chơi FPL?** Xem [FPL 101 primer](FPL_101.md).
+> **Phạm vi:** Nghiên cứu / cá nhân.
 
 ---
 
@@ -32,7 +32,7 @@ Data-driven agent. Picks + manages 15-player FPL squad. Pipeline: quantile-regre
 
 ## 1. Architecture
 
-End-to-end. CSVs + live overlay → markdown report (squad, XI, captain, transfers, hits, chips). 2×/day refresh.
+Toàn bộ luồng xử lý end-to-end. Từ file CSV + dữ liệu live → báo cáo markdown (squad, XI, đội trưởng, chuyển nhượng, hits, chips). Cập nhật 2 lần/ngày.
 
 ```mermaid
 flowchart TD
@@ -52,23 +52,23 @@ flowchart TD
     D & E & M & N --> F --> G --> H --> I
 ```
 
-Artifacts persist under `data/`. Retrain only missing. GitHub Actions [.github/workflows/pipeline.yml](../.github/workflows/pipeline.yml) runs 05:30 + 17:30 UTC, 30 min after upstream refresh. Walk-forward recalib auto-fires when JSONs > `RECALIB_STALE_DAYS` (= 14) — `_maybe_recalibrate` in [src/main.py](../src/main.py).
+Các artifact được lưu trong `data/`. Chỉ train lại khi thiếu. GitHub Actions [.github/workflows/pipeline.yml](../.github/workflows/pipeline.yml) chạy lúc 05:30 + 17:30 UTC, 30 phút sau khi nguồn dữ liệu refresh. Walk-forward recalib tự kích hoạt khi JSON cũ hơn `RECALIB_STALE_DAYS` (= 14 ngày) — xem `_maybe_recalibrate` trong [src/main.py](../src/main.py).
 
-**Guards in [src/main.py](../src/main.py)**: (a) `_ensure_models` checks cached booster `feature_names` vs `features.py` output (`_schema_drift`); forces retrain + wipes matching recalib JSON. (b) `_gw_in_play` short-circuits when fixture live (kickoff last 3h, `finished=False`) or imminent (next 2h) — no useless lineup mid-GW.
+**Guards trong [src/main.py](../src/main.py)**: (a) `_ensure_models` kiểm tra `feature_names` của booster đã cache so với output của `features.py` (`_schema_drift`); tự train lại và xóa recalib JSON tương ứng nếu lệch. (b) `_gw_in_play` bỏ qua pipeline khi đang có trận đấu diễn ra (kickoff trong 3h qua, `finished=False`) hoặc sắp diễn ra (2h tới) — tránh chạy vô ích giữa GW.
 
 ---
 
 ## 2. Features
 
-[src/features.py](../src/features.py). Two families: team-state (match model); player lags (points model). Strict shift-1 GW partitioning prevents leakage.
+[src/features.py](../src/features.py). Hai nhóm feature: trạng thái đội (match model) và lag cầu thủ (points model). Phân vùng GW nghiêm ngặt shift-1 để tránh data leakage.
 
 ### 2.1 Team Elo
 
-Pre-match Elo per fixture from FPL-CI (ClubElo, point-in-time). Stamped `elo_h_pre` / `elo_a_pre`. Chronological replay = fallback when null.
+Elo trước trận theo từng fixture từ FPL-CI (ClubElo, point-in-time). Lưu thành `elo_h_pre` / `elo_a_pre`. Replay theo thứ tự thời gian dùng làm fallback khi null.
 
-Standard Elo: expected from rating diff + HFA; update by K × MoV-multiplier × (actual − expected). MoV from FiveThirtyEight sports-Elo ([How We Calculate NBA Elo Ratings][ref-538]) — dampens blowouts, rewards decisive wins. Elo→football validated by [Hvattum & Arntzen][ref-hvattum].
+Elo tiêu chuẩn: kỳ vọng từ chênh lệch rating + HFA; cập nhật theo K × hệ số MoV × (thực tế − kỳ vọng). MoV theo FiveThirtyEight sports-Elo — giảm ảnh hưởng của thắng đậm, thưởng cho thắng thuyết phục.
 
-| Hyperparam (fallback) | Value |
+| Siêu tham số (fallback) | Giá trị |
 | --- | --- |
 | K | 20 |
 | HFA | 60 Elo |
@@ -76,29 +76,29 @@ Standard Elo: expected from rating diff + HFA; update by K × MoV-multiplier × 
 
 ### 2.2 Rolling team + player metrics
 
-**Match**: EMA halflife $w/2$, $w \in \{3,5,10\}$ FPL block, $w=5$ Opta block. Shift-1. Recent GWs decay slow, no hard cutoff.
+**Match**: EMA halflife $w/2$, $w \in \{3,5,10\}$ FPL block, $w=5$ Opta block. Shift-1. GW gần đây giảm chậm, không có hard cutoff.
 
-| Source | Stats |
+| Nguồn | Thống kê |
 | --- | --- |
-| Aggregated FPL `history` | xG, xGA, GF, GA |
-| Opta team-level `fixtures.csv` | Opta xG (`oxg`), big chances (`obc`), shots (`osh`) + conceded |
+| FPL `history` tổng hợp | xG, xGA, GF, GA |
+| Opta team-level `fixtures.csv` | Opta xG (`oxg`), big chances (`obc`), shots (`osh`) + bàn thua |
 
-**Stakes** ([src/league_table.py](../src/league_table.py)): per-(season, event) standings from finished fixtures. Signed pts gap to tier cutoffs (title / UCL top-4 / Euro top-6 / safety 17th), normalized by max remaining. Match model: `h_*` + `a_*`. Points model: `own_*` / `opp_*`. Encodes late-season step-changes (title chase, beach mode, drop-fight).
+**Stakes** ([src/league_table.py](../src/league_table.py)): bảng xếp hạng theo (season, event) từ các trận đã kết thúc. Khoảng cách điểm có dấu đến các ngưỡng (vô địch / top 4 UCL / top 6 châu Âu / trụ hạng hạng 17), chuẩn hóa theo số trận còn lại tối đa. Match model: `h_*` + `a_*`. Points model: `own_*` / `opp_*`. Phản ánh thay đổi cuối mùa (đua vô địch, chế độ nghỉ hè, trụ hạng).
 
-**Points**: lagged minutes $m_{t-1,2,3}$ + 5/10-GW per-player rolling means (xG, xA, xGI, BPS, ICT, saves, CBI, tackles, recoveries) + six Opta from `playermatchstats.csv` (`oxg`, `oxa`, `occ`, `otob`, `osh`, `odrib`). Fixture ctx from match-feature join: `is_home`, `opp_xg_5`, `opp_xga_5`, `opp_elo`, `own_elo`, `elo_gap`. Set-piece + pen flags from playerstats. Rolling `total_points` excluded — feedback-loop risk; underlying xG/xA/ICT carry form signal cleanly.
+**Points**: lag phút $m_{t-1,2,3}$ + rolling 5/10-GW theo cầu thủ (xG, xA, xGI, BPS, ICT, saves, CBI, tackles, recoveries) + sáu chỉ số Opta từ `playermatchstats.csv`. Ngữ cảnh fixture từ join match-feature: `is_home`, `opp_xg_5`, `opp_xga_5`, `opp_elo`, `own_elo`, `elo_gap`. Flag set-piece + penalty từ playerstats. `total_points` rolling bị loại — nguy cơ feedback-loop; xG/xA/ICT đã mang tín hiệu form đủ.
 
 ### 2.3 Cup congestion (minutes head)
 
-[src/features.py](../src/features.py) `_team_cup_congestion` + [src/data_loader.py](../src/data_loader.py) `_build_cup_fixtures`. Per-(team, event, season) count of non-PL cup matches within ±`CUP_WINDOW_DAYS` (= 3) of each PL kickoff. Sources: `EFL Cup`, `Champions League`, `Europa League`, `Conference League` from FPL-CI `By Tournament/<cup>/GW{n}/{fixtures,matches}.csv`. Foreign-club opponents dropped at remap — row stays tied to English side. Output → `data/cup_fixtures.csv`.
+[src/features.py](../src/features.py) `_team_cup_congestion` + [src/data_loader.py](../src/data_loader.py) `_build_cup_fixtures`. Số trận cup non-PL trong ±`CUP_WINDOW_DAYS` (= 3 ngày) quanh mỗi trận PL, theo (team, event, season). Nguồn: `EFL Cup`, `Champions League`, `Europa League`, `Conference League` từ FPL-CI. Output → `data/cup_fixtures.csv`.
 
-| Col | Meaning |
+| Cột | Ý nghĩa |
 | --- | --- |
-| `cup_pre` | Cup matches in $[-W, 0)$ days (recent-fatigue rotation) |
-| `cup_post` | Cup matches in $[0, +W]$ days (upcoming-priority rotation) |
+| `cup_pre` | Trận cup trong $[-W, 0)$ ngày (xoay tua do mệt mỏi gần đây) |
+| `cup_post` | Trận cup trong $[0, +W]$ ngày (ưu tiên trận sắp tới) |
 | `cup_total` | `cup_pre + cup_post` |
-| `days_to_next_cup` | `min(positive delta_days)`; sentinel 999 when none |
+| `days_to_next_cup` | `min(positive delta_days)`; sentinel 999 nếu không có |
 
-Pivoted to `own_*` via `is_home` at engine inference (refreshed per upcoming fixture, not stale historical row — see [src/fpl_engine.py](../src/fpl_engine.py) `_inference_rows`). Consumed by **minutes head only** — captures rotation signal (e.g. Chelsea resting EPL XI before UECL final) that pure lag-minutes can't anticipate before first benching. Points head doesn't see cup cols — rotation already mediated via reduced `mins_pred`.
+Chỉ dùng cho **minutes head** — nắm bắt tín hiệu xoay tua (ví dụ Chelsea nghỉ EPL XI trước chung kết UECL) mà lag phút thuần túy không thể dự đoán trước khi lần dự bị đầu tiên xảy ra. Points head không dùng cup cols — xoay tua đã được phản ánh qua `mins_pred` giảm.
 
 ---
 
@@ -108,11 +108,11 @@ Pivoted to `own_*` via `is_home` at engine inference (refreshed per upcoming fix
 
 ### 3.1 Poisson goals
 
-Two independent XGBoost `count:poisson` regressors → expected goals per side. Backbone: [XGBoost][ref-xgboost]. 31-dim feature vec from §2.
+Hai bộ hồi quy XGBoost `count:poisson` độc lập → expected goals mỗi bên. Backbone: XGBoost. Vector feature 31 chiều từ §2.
 
 ### 3.2 Clean sheets
 
-CS = independent-Poisson marginal: $P(\text{home CS}) = e^{-\lambda_a}$, $P(\text{away CS}) = e^{-\lambda_h}$. Written to `fixture_lambdas.csv` (`cs_h_p`, `cs_a_p`). Consumed as features in points head (`own_cs_p`, `opp_cs_p`).
+CS = marginal Poisson độc lập: $P(\text{home CS}) = e^{-\lambda_a}$, $P(\text{away CS}) = e^{-\lambda_h}$. Ghi vào `fixture_lambdas.csv` (`cs_h_p`, `cs_a_p`). Dùng làm feature trong points head (`own_cs_p`, `opp_cs_p`).
 
 ---
 
@@ -122,196 +122,156 @@ CS = independent-Poisson marginal: $P(\text{home CS}) = e^{-\lambda_a}$, $P(\tex
 
 ### 4.1 Quantile boosters
 
-FPL points: discrete, heavy-tailed, bimodal (DNP zero + wide when playing).
+Điểm FPL: rời rạc, heavy-tailed, bimodal (không ra sân = 0 + phân tán khi ra sân).
 
-| Quantile | Use |
+| Quantile | Mục đích |
 | --- | --- |
-| q10 | Floor, spread |
+| q10 | Sàn, độ phân tán |
 | q50 | Median anchor → Swanson μ (§4.4) |
-| q90 | TC timing, spread |
+| q90 | Thời điểm TC, độ phân tán |
 
-**Per-position** boosters — 4 × 3 = 12 — `reg:quantileerror`, $\alpha \in \{0.10, 0.50, 0.90\}$. Pinball loss from [Koenker & Bassett][ref-koenker]. Target: raw `total_points` (minus bonus, see §4.8). Subsumes goals, assists, CS, BPS, deductions jointly. No hand-coded scoring table.
+**Booster theo vị trí** — 4 × 3 = 12 — `reg:quantileerror`, $\alpha \in \{0.10, 0.50, 0.90\}$. Mục tiêu: `total_points` thô (trừ bonus, xem §4.8). Bao gồm bàn thắng, kiến tạo, CS, BPS, trừ điểm cùng lúc. Không cần bảng tính điểm thủ công.
 
-Per-position to break population-mean trap — scoring distributions differ structurally (GK saves, DEF CS, MID score+assist, FWD convert). Trade-off: ~3k rows/FWD subset, q90 outlier-sensitive. Regularization: `max_depth=3`, `min_child_weight=30`, `reg_alpha=0.5`, `reg_lambda=2.0` + sanity clip at 25 (credible boom: hat-trick + assist + bonus).
+Phân theo vị trí để tránh bẫy trung bình tổng thể — phân phối điểm khác nhau theo cấu trúc (GK saves, DEF CS, MID ghi bàn+kiến tạo, FWD ghi bàn).
 
 ### 4.2 Non-crossing
 
-Independent quantile fits can cross. Row-sort predictions ascending at inference. Affects <2% rows.
+Các quantile fit độc lập có thể bị đảo. Row-sort dự đoán tăng dần khi inference. Ảnh hưởng < 2% hàng.
 
 ### 4.3 Inference: DGWs, BGWs, injuries
 
-Per (i, t): one feature row per fixture player's club plays that GW (0/1/2).
+Mỗi (i, t): một feature row cho mỗi fixture mà đội cầu thủ thi đấu trong GW đó (0/1/2 trận).
 
-**Mixture-quantile transform via two-stage minutes head** ([src/train_minutes_model.py](../src/train_minutes_model.py)): `binary:logistic` $P(\text{plays})$ on full row set + `reg:logistic` $E[\text{mins}/90 \mid \text{plays}]$ on played-only subset; minutes feature subset is the minutes-only superset of points cols (drops set-piece + per-action rolling — circular for predicting playing time) + cup-congestion §2.3. Both points + bonus heads train on `minutes > 0` rows, so their predicted $q_\alpha$ are **conditional** quantiles $F_\text{played}^{-1}(\alpha)$. The unconditional points distribution is the zero-inflated mixture (DNP with prob $1-p$, else $Y \sim F_\text{played}$), whose CDF inverts to
+**Mixture-quantile transform qua two-stage minutes head**: `binary:logistic` $P(\text{plays})$ trên toàn bộ rows + `reg:logistic` $E[\text{mins}/90 \mid \text{plays}]$ trên subset đã ra sân; quantile points + bonus heads đều train trên rows `minutes > 0`, nên dự đoán $q_\alpha$ là **conditional quantiles**. Phân phối điểm unconditional là hỗn hợp zero-inflated, với:
 
-$$
-q_\alpha^\text{unc} = \begin{cases} 0 & \alpha \leq 1-p \\ F_\text{played}^{-1}\!\left(\dfrac{\alpha-(1-p)}{p}\right) & \alpha > 1-p \end{cases}
-$$
+$$q_\alpha^\text{unc} = \begin{cases} 0 & \alpha \leq 1-p \\ F_\text{played}^{-1}\!\left(\dfrac{\alpha-(1-p)}{p}\right) & \alpha > 1-p \end{cases}$$
 
-with $p = P(\text{plays})$. `_mixture_quantile` in [src/fpl_engine.py](../src/fpl_engine.py) approximates $F_\text{played}^{-1}$ by piecewise-linear interpolation through the three known knots $(0.1, q_{10}),\,(0.5, q_{50}),\,(0.9, q_{90})$. This is the statistically correct unconditional transform — replaces the older $q_\alpha \cdot p$ heuristic, which is valid only for the mean ($E[\mathbb{1}\cdot Y] = p\,E[Y]$) and under-counts $q_{90}$ for rotation-prone high-ceiling profiles while inflating $q_{10}$ above 0 whenever $\alpha \leq 1-p$. DGW clip at 1. Next GW: FPL `chance_of_playing_next_round / 100` = hard upper bound on plays; statuses `s`/`n`/`u` zero the row.
+DGW clip ở 1. GW tiếp theo: `chance_of_playing_next_round / 100` từ FPL API = giới hạn trên cứng cho xác suất ra sân; status `s`/`n`/`u` sẽ zero hàng đó.
 
-**Aggregation across fixtures** per (i, t): variance-additive sum of moments within the player's GW. BGW → 0. DGW stacks additively at the $(\mu, \sigma^2)$ level so the joint $q_\alpha$ of a double-fixture week reflects $\sqrt{2}\,\sigma$ dispersion rather than $2\sigma$.
+**Aggregation across fixtures** theo (i, t): tổng các moment theo phương sai-cộng trong GW của cầu thủ. BGW → 0. DGW cộng dồn ở mức $(\mu, \sigma^2)$.
 
 ### 4.4 Swanson mean + dispersion
 
-Optimizer needs scalar μ + dispersion s per (i, t). FPL right-skewed → median q50 under-shoots mean. Swanson / Keefer–Bodily 3-quantile: $\mu = 0.3 q_{10} + 0.4 q_{50} + 0.3 q_{90}$. Calibrated to lognormal-family distributions.
+Optimizer cần scalar μ + dispersion s cho mỗi (i, t). FPL lệch phải → median q50 thấp hơn mean. Swanson / Keefer–Bodily 3-quantile: $\mu = 0.3 q_{10} + 0.4 q_{50} + 0.3 q_{90}$.
 
-Dispersion: central mass ≈ Gaussian → q10–q90 ≈ 2.56 σ. Emit **std** $s = (q_{90} - q_{10}) / 2.56$, not variance (CBC LP-only, no MIQP). Linear `−λ·s` penalty keeps risk on EV scale; $s^2$ would over-punish ceilings.
+Dispersion: $s = (q_{90} - q_{10}) / 2.56$ (std, không phải variance). Phạt linear `−λ·s` giữ risk trên thang EV.
 
 ### 4.5 Captaincy score
 
-Separate from XI selection. Anchor on μ + fraction of upside:
+Tách biệt khỏi chọn XI. Neo trên μ + phần upside:
 
 $$\kappa = \mu + \gamma (q_{90} - \mu), \quad \gamma = 0.3$$
 
-`CAP_UPSIDE_WEIGHT` in [src/fpl_engine.py](../src/fpl_engine.py). Lower (0.2) → safer; higher (0.5+) → boom-chase.
+`CAP_UPSIDE_WEIGHT` trong [src/fpl_engine.py](../src/fpl_engine.py). Thấp hơn (0.2) → an toàn hơn; cao hơn (0.5+) → đuổi boom.
 
 ### 4.6 Isotonic points recalib
 
-Per-(pos, α) monotone non-param map at inference closes pinball/coverage gap on played-only rows. [src/recalibrate_points.py](../src/recalibrate_points.py):
-
-1. Equal-frequency bin `q_pred` into ~20 buckets per cell.
-2. Per bin, take empirical α-quantile of `y` as target.
-3. Fit `sklearn.isotonic.IsotonicRegression(out_of_bounds="clip")`. Knots → `{type: "iso", knots: [[x,y],…]}`.
-
-Affine fallback $a + b q_\text{pred}$, $b \in [0.1, 5.0]$, for cells with rows < `MIN_ROWS_ISOTONIC` (= 400). Slope floor preserves per-row ranking. Stored `{type: "affine", ab: [a, b]}`.
-
-```json
-{pos_id: {q10|q50|q90: {type: "iso"|"affine", knots|ab: ...}}}
-```
-
-Auto-loaded by `predict_quantiles` after row-sort, before sanity clip. Non-crossing re-enforced post-recalib.
+Map đơn điệu non-parametric theo (pos, α) khi inference để bù khoảng cách pinball/coverage trên played-only rows. [src/recalibrate_points.py](../src/recalibrate_points.py). Affine fallback khi hàng < `MIN_ROWS_ISOTONIC` (= 400).
 
 ### 4.7 Isotonic minutes recalib
 
-Per-position monotone isotonic map on raw minutes/90 booster. Fit on walk-forward `minutes_pred.csv` per pos_id ∈ {1..4} via `IsotonicRegression(out_of_bounds="clip", y_min=0, y_max=1)` ([src/recalibrate_minutes.py](../src/recalibrate_minutes.py)). Target = binary `played`; raw `mins_pred` treated as $P(\text{played})$. Knots → `data/minutes_recalib.json`.
-
-`predict_minutes(..., apply_recalib=True)` auto-loads, linear-interp between knots, then multiplied onto quantiles in [src/fpl_engine.py](../src/fpl_engine.py). FPL `chance_of_playing_next_round` upper bound untouched.
+Map isotonic đơn điệu theo vị trí trên raw minutes/90 booster. [src/recalibrate_minutes.py](../src/recalibrate_minutes.py). Knots → `data/minutes_recalib.json`.
 
 ### 4.8 Bonus head (variance-additive combine)
 
-[src/train_bonus_model.py](../src/train_bonus_model.py). Bonus ∈ {0,1,2,3} = top-3 BPS scorers per match. Three quantile boosters (`reg:quantileerror`, $\alpha \in \{0.10, 0.50, 0.90\}$), single shared model (sparse target), trained on `minutes > 0` rows (DNP bonus = 0 by definition; filter prevents q-collapse toward 0). Points head trained on `total_points - bonus` in [src/features.py](../src/features.py) → no double-count.
+[src/train_bonus_model.py](../src/train_bonus_model.py). Bonus ∈ {0,1,2,3} = top-3 BPS scorers mỗi trận. Ba quantile boosters, model chung (sparse target), train trên rows `minutes > 0`. Points head train trên `total_points - bonus` → không double-count.
 
-Engine combines the points + bonus heads at the moment level rather than by summing quantiles. Linear quantile addition is statistically invalid for independent components — $q_\alpha(X+Y) \neq q_\alpha(X) + q_\alpha(Y)$, and the latter over-states $q_{90}$ by up to $\sqrt{2}$ in the equal-variance limit, biasing $\kappa$ toward high-bonus-history archetypes whose true joint upside is lower. Pearson–Tukey gives per-row $(\mu_p, \sigma_p)$, $(\mu_b, \sigma_b)$; under independence the combined distribution has
+Engine kết hợp points + bonus heads ở cấp moment, không cộng quantile trực tiếp (không hợp lệ về thống kê):
 
 $$\mu_c = \mu_p + \beta\,\mu_b, \qquad \sigma_c^2 = \sigma_p^2 + \beta^2\,\sigma_b^2$$
 
-so $q_{\alpha,c} = \mu_c + z_\alpha\,\sigma_c$ under the Gaussian envelope already used by the sampler in §4.9. `BONUS_BLEND` ($\beta$, default 1.0) scales the bonus moments uniformly — a true damping knob, not a quantile multiplier.
+`BONUS_BLEND` ($\beta$, mặc định 1.0) scale đều bonus moments.
 
 ### 4.9 Joint MC aggregation
 
-[src/fpl_engine.py](../src/fpl_engine.py) `_joint_mc_aggregate`. Per-row moments arrive already combined per §4.8 — points + bonus folded into $(\mu, \sigma)$ via variance-additive independence — and already conditioned to the unconditional distribution per §4.3. The sampler layers a per-(team, GW) **position-factor vector** $f \sim \mathcal{N}(0, C)$ on top of per-row idiosyncratic $\varepsilon$, where $C \in \mathbb{R}^{4 \times 4}$ is the within-team position correlation matrix from `data/team_rho.json::by_pos_pair`. Captures within-club covariance (Liverpool CS lifts Virgil + Salah together; goal blitz lifts Salah + Diaz) with per-position asymmetry — GK-DEF/DEF-DEF share most of the signal, FWD-FWD almost none.
+[src/fpl_engine.py](../src/fpl_engine.py) `_joint_mc_aggregate`. Sampler đặt thêm **position-factor vector** $f \sim \mathcal{N}(0, C)$ theo từng (team, GW) lên idiosyncratic $\varepsilon$, với $C \in \mathbb{R}^{4 \times 4}$ là ma trận tương quan vị trí trong cùng đội từ `data/team_rho.json`. Nắm bắt hiệp phương sai trong câu lạc bộ (Liverpool CS đẩy Virgil + Salah cùng lúc).
 
-**Cholesky factor model.** Build a 4×4 PSD matrix $C$ (diag = same-position ρ, off-diag = cross-position ρ; missing entries fall back to global ρ; negative diagonals — e.g. empirical 4-4 ≈ -0.11 on small n — clipped to 0; eigen-clip floor 1e-6 to guarantee PSD). Cholesky $C = L L^\top$. Per (team, GW): draw $z \sim \mathcal{N}(0, I_4)$, set $f = Lz$. A row at position $p$ takes its team-correlated component as $\sigma_i \cdot f_{p}$; the idiosyncratic remainder $\sigma_i \sqrt{1 - C_{p,p}} \, \varepsilon_i$ restores $\mathrm{Var}(X_i) = \sigma_i^2$. The induced covariance is
-
-$$\mathrm{Cov}(X_i, X_j \mid \text{same team, GW}) = \sigma_i \sigma_j \cdot C_{p_i, p_j}$$
-
-exactly — i.e. recovers the empirical position-pair correlation directly. The earlier scalar-ρ formulation induced $\sigma_i \sigma_j \rho^2$ (variance-explained, not correlation), an under-statement of within-club covariance and unable to distinguish GK-DEF ($C_{1,2} \approx 0.23$) from FWD-FWD ($C_{4,4} \approx 0$). Smoke test confirms reproduction to $\sim 10^{-4}$ on 20k Monte-Carlo draws. Legacy scalar path retained as a fallback (`team_corr=None`) when `team_rho.json` is absent.
-
-`MC_TEAM_CORR = (C, L)` loaded by `_load_team_corr_matrix` at module import. Scalar fallback `MC_TEAM_RHO` from `rho_global` (default 0.4). `MC_SAMPLES = 800`. Per (i, t): sum draw-level pts across DGW fixtures within draw, take sample mean (μ), std (s), 90th-quantile (`cap_xp`).
-
-**Empirical fit**: standardised residuals $z = (y - \mu) / s$ from points + bonus heads, paired same-team-same-GW, Pearson. `team_rho.json` stores global ρ + position-pair breakdown — both now consumed by the engine (matrix path is the default; scalar `rho_global` remains the fallback path when the JSON is missing).
+`MC_SAMPLES = 800`. Theo (i, t): tổng điểm draw-level qua các fixture DGW trong draw, lấy sample mean (μ), std (s), 90th-quantile (`cap_xp`).
 
 ---
 
 ## 5. Optimization
 
-[src/optimizer.py](../src/optimizer.py). PuLP ([ref][ref-pulp]) + bundled CBC.
+[src/optimizer.py](../src/optimizer.py). PuLP + bundled CBC.
 
 ### 5.1 Decision vars
 
-Per player $i \in \{1..N\}$ + GW $t \in \{t_0..t_0+H-1\}$, $H = 8$:
+Mỗi cầu thủ $i \in \{1..N\}$ + GW $t \in \{t_0..t_0+H-1\}$, $H = 8$:
 
-| Var | Domain | Meaning |
+| Biến | Miền | Ý nghĩa |
 | --- | --- | --- |
-| $x_{i,t}$ | binary | In 15-man squad |
-| $s_{i,t}$ | binary | In XI |
-| $c_{i,t}$ | binary | Captain |
-| $\text{tin}_{i,t}$ | binary | Transferred IN |
-| $\text{ft}_t$ | int 1–5 | Free transfers entering |
-| $\text{sv}_t$ | int 0–5 | FT saved |
-| $h_t$ | int ≥ 0 | 4-pt hits |
-
-Cold-start: $x_{i,t} → x_i$ (fixed across horizon).
+| $x_{i,t}$ | nhị phân | Trong squad 15 người |
+| $s_{i,t}$ | nhị phân | Trong XI |
+| $c_{i,t}$ | nhị phân | Đội trưởng |
+| $\text{tin}_{i,t}$ | nhị phân | Chuyển nhượng VÀO |
+| $\text{ft}_t$ | int 1–5 | Free transfers còn lại |
+| $\text{sv}_t$ | int 0–5 | FT tiết kiệm |
+| $h_t$ | int ≥ 0 | Hit 4 điểm |
 
 ### 5.2 Objective
 
-Maximize horizon sum of: starter EV ($\mu s$) + bench auto-sub EV ($b \mu (x-s)$, $b = 0.15$) + captain ($\kappa c$) − risk ($\nu s x$, linear) + EO tilt ($\eta \mu (1-\text{EO}) x$, zero by default) − hit cost ($4 h_t$).
+Tối đa hóa tổng horizon: EV starter ($\mu s$) + bench auto-sub EV ($b \mu (x-s)$, $b = 0.15$) + đội trưởng ($\kappa c$) − rủi ro ($\nu s x$, linear) + EO tilt ($\eta \mu (1-\text{EO}) x$, mặc định 0) − hit cost ($4 h_t$).
 
-- $\mu$ = Swanson §4.4.
-- $b = 0.15$ ≈ $P(\text{auto-sub in})$ × avg starter-pts retained.
-- **Risk linear in std, not variance** — CBC LP-only; $s^2$ needs MIQP + over-punishes ceilings. Precedent: [Hunter, Vielma & Zaman][ref-hvz].
-- **EO tilt** zero default → pure EV. $\eta > 0$ → differentials → rank-EV.
-- Full quadratic $x^\top \Sigma x$ needs MIQP. Within-team corr bounded by 3-per-club cap, partly absorbed into learned $s$.
+- **Risk linear theo std, không phải variance** — CBC LP-only; $s^2$ cần MIQP.
+- **EO tilt** mặc định 0 → EV thuần. $\eta > 0$ → chọn differentials.
 
-### 5.3 Structural constraints (every t)
+### 5.3 Structural constraints (mỗi t)
 
-- Squad = 15. Quotas: 2 GK, 5 DEF, 5 MID, 3 FWD.
-- ≤ 3 players per club.
-- Budget ≤ prior squad value + bank.
-- XI = 11, captain = 1, $c ≤ s ≤ x$.
-- **MID/FWD-only captaincy**: $c = 0$ for GK/DEF. DEF booms correlated with team → doubling leaks rank-EV.
+- Squad = 15. Quota: 2 GK, 5 DEF, 5 MID, 3 FWD.
+- ≤ 3 cầu thủ mỗi câu lạc bộ.
+- Budget ≤ giá trị squad trước + bank.
+- XI = 11, đội trưởng = 1, $c ≤ s ≤ x$.
+- **Đội trưởng chỉ từ MID/FWD**: $c = 0$ với GK/DEF.
 - Formation: 1 GK, ≥3 DEF, ≥2 MID, ≥1 FWD.
 
 ### 5.4 Transfers
 
-- $\text{tin}_{i,t} \geq x_{i,t} - x_{i,t-1}$. $x_{i, t_0-1} = 1$ if in prior squad.
-- $\text{ft}_t = \min(5, 1 + \text{sv}_{t-1})$ for $t > t_0$.
-- $\sum_i \text{tin}_{i,t} = (\text{ft}_t - \text{sv}_t) + h_t$, $0 \leq h_t \leq H_\text{max}$, $\text{sv}_t \leq \text{ft}_t$.
-- Hit cost $C_h = 6$ (FPL nominal 4, raised to discourage churn). $H_\text{max} = 1$.
-
-**Banking reward** $\omega \text{sv}_t$ ($\omega = 0.3$, attenuated by $\gamma^k$) — option value of rolling FT to next GW.
-**Bank-leftover penalty** in `solve_initial_squad`: $+\beta \sum_i p_i x_i$ ($\beta = 0.5$). Discourages cash hoarding when premium picks marginally above cheap ones.
+- $\text{ft}_t = \min(5, 1 + \text{sv}_{t-1})$ cho $t > t_0$.
+- Hit cost $C_h = 6$ (FPL danh nghĩa 4, tăng để hạn chế churn). $H_\text{max} = 1$.
+- **Banking reward** $\omega \text{sv}_t$ ($\omega = 0.3$) — option value của FT rolled sang GW sau.
 
 ### 5.5 RHC
 
-$H = 8$ look-ahead each week. Geometric discount $w_k = \gamma^k$, $\gamma = 0.85$. Profile: $[1.00, 0.85, 0.72, 0.61, 0.52, 0.44, 0.38, 0.32]$. Hit cost $-4 h_t$ **not** attenuated.
-
-Only $t_0$ executed: `transfers_in/out`, `xi_ids`, `captain`, `vice`, `hits`. Next week re-solves. See [Mayne MPC survey][ref-mpc].
+Look-ahead $H = 8$ tuần. Chiết khấu hình học $w_k = \gamma^k$, $\gamma = 0.85$. Chỉ thực thi $t_0$: `transfers_in/out`, `xi_ids`, `captain`, `vice`, `hits`. Tuần sau giải lại từ đầu.
 
 ---
 
 ## 6. Chips
 
-[src/chips.py](../src/chips.py). Greedy post-processing over projection frame — MILP doesn't see chip activation directly.
+[src/chips.py](../src/chips.py). Greedy post-processing trên projection frame.
 
-**2025/26 rules**: 8 chips, two of each. Set 1 (TC1/BB1/FH1/WC1) expires GW19. Set 2 GW20+. TC × 3. FH no consecutive GWs. WC + FH preserve banked transfers.
+**Luật 2025/26**: 8 chips, hai bộ mỗi loại. Bộ 1 (TC1/BB1/FH1/WC1) hết hạn GW19. Bộ 2 từ GW20+. TC × 3. FH không được chơi hai GW liên tiếp. WC + FH giữ nguyên FT đã tích lũy.
 
 | Chip | Heuristic |
 | --- | --- |
-| **TC** (×3) | GW + owned MID/FWD maxing $\kappa$ §4.5 |
-| **BB** | GW maxing $\sum_\text{bench} \mu$ |
-| **FH** | GW with most blanking teams. Non-consecutive |
-| **WC** | Trigger if RHC proposes ≥4 transfers IN or ≥2 hits |
-
-**Replay** ([src/season_replay.py](../src/season_replay.py)): all four under FPL "one chip per GW" rule. Per-half candidates compete on uplift — TC: $q_{90,\text{cap}} - \mu_\text{cap}$ (trigger 4.5), BB: $\sum_\text{bench} \mu$ (10.0), WC: horizon-discounted XI-EV uplift from `solve_initial_squad(proj, budget=squad_val+bank)` rebuild (8.0), FH: one-GW XI-EV uplift from single-GW slice via `_one_gw_proj` (6.0, non-consecutive). WC + FH alt-solves gated by `WC_ATTEMPT_GWS` / `FH_ATTEMPT_GWS` windows + half-deadline force → ~16 alt-solves/season at `time_limit=30s`. Force-fire GW19/GW38 picks max-uplift unused chip. WC replaces squad + resets next-GW FT to 1; FH = one-GW temp XI, reverts squad/bank/FT.
+| **TC** (×3) | GW + MID/FWD đang sở hữu có $\kappa$ cao nhất |
+| **BB** | GW tối đa $\sum_\text{bench} \mu$ |
+| **FH** | GW có nhiều đội blank nhất. Không liên tiếp |
+| **WC** | Kích hoạt nếu RHC đề xuất ≥4 chuyển nhượng VÀO hoặc ≥2 hits |
 
 ---
 
 ## 7. Validation
 
-[src/backtest.py](../src/backtest.py) + [src/calibration.py](../src/calibration.py). All three heads (points, match, minutes). Run: `python src/backtest.py --k 5` or `--start S --end E`. Output → `data/processed/backtest/`.
+[src/backtest.py](../src/backtest.py) + [src/calibration.py](../src/calibration.py). Ba heads (points, match, minutes). Chạy: `python src/backtest.py --k 5` hoặc `--start S --end E`. Output → `data/processed/backtest/`.
 
 ### 7.1 Walk-forward CV
 
-Per holdout GW $G$: retrain on `round < G`, predict `round = G`. Rolling features shift-1 → frame built once on full history leakage-free as long as `round ≥ G` excluded from training. Split by `round` post-construction, not rebuild per holdout.
+Mỗi holdout GW $G$: train lại trên `round < G`, dự đoán `round = G`. Feature rolling shift-1 → frame xây một lần trên toàn bộ lịch sử, không bị leakage miễn là `round ≥ G` bị loại khỏi training.
 
 ### 7.2 Points calibration
 
-Two scopes per (pos, quantile):
-
-- **all** — every (player, GW) incl DNPs (y=0 inflates lower-tail cov).
-- **played** — `minutes > 0`. Production-conditional, feeds §4.6 recalib.
-
-Per quantile: empirical coverage $P(y \leq q_\alpha)$, gap from $\alpha$, pinball. Position-pooled overall row.
+Hai phạm vi theo (pos, quantile):
+- **all** — mọi (cầu thủ, GW) kể cả DNPs (y=0 làm tăng coverage đuôi dưới).
+- **played** — `minutes > 0`. Production-conditional, dùng cho recalib §4.6.
 
 ### 7.3 Match calibration
 
-Per side on held-out fixtures: marginal Poisson NLL, goal MAE, CS Brier, CS rate gap. CS = $e^{-\lambda_\text{opp}}$. Persistent CS bias → tune λ-head hyperparams or add stronger defensive features.
+Marginal Poisson NLL, goal MAE, CS Brier, CS rate gap trên từng bên theo fixture holdout.
 
 ### 7.4 Minutes audit
 
-Walk-forward held-out mins/90 + binary `played`: MAE, ROC-AUC, Brier, 10-bin reliability (predicted-mean vs actual-played-rate per bucket). Run with `--minutes-recalib data/minutes_recalib.json` to audit calibrated predictions.
+Walk-forward mins/90 + binary `played`: MAE, ROC-AUC, Brier, reliability 10 bin. Chạy với `--minutes-recalib data/minutes_recalib.json` để audit dự đoán đã calibrate.
 
 ---
 
@@ -320,29 +280,28 @@ Walk-forward held-out mins/90 + binary `played`: MAE, ROC-AUC, Brier, 10-bin rel
 ```text
 fpl-ml-manager/
 ├── src/
-│   ├── main.py                  # Orchestrator + report writer
+│   ├── main.py                  # Orchestrator + viết report
 │   ├── data_loader.py           # FPL-CI CSV + live API overlay
 │   ├── features.py              # Elo + rolling + Opta
 │   ├── train_match_model.py     # Poisson goals + CS marginals
 │   ├── train_points_model.py    # 12 quantile boosters
 │   ├── train_minutes_model.py   # Two-stage P(plays) × E[mins/90|plays]
-│   ├── train_bonus_model.py     # 3 quantile boosters on FPL bonus
-│   ├── fit_team_rho.py          # Empirical team-correlation fit
+│   ├── train_bonus_model.py     # 3 quantile boosters cho FPL bonus
+│   ├── fit_team_rho.py          # Fit tương quan trong đội
 │   ├── fpl_engine.py            # Inference + projection frame + joint MC
 │   ├── optimizer.py             # MILP + RHC
-│   ├── chips.py                 # TC/BB/FH/WC heuristics
+│   ├── chips.py                 # Heuristic TC/BB/FH/WC
 │   ├── backtest.py              # Walk-forward CV
 │   ├── calibration.py           # Coverage/pinball/Brier
-│   ├── recalibrate_points.py    # Per-(pos,α) isotonic / affine
-│   ├── recalibrate_minutes.py   # Per-pos isotonic
-│   ├── league_table.py          # Standings + stakes
-│   └── season_replay.py         # GW-by-GW chip-aware backtest
+│   ├── recalibrate_points.py    # Isotonic/affine theo (pos,α)
+│   ├── recalibrate_minutes.py   # Isotonic theo vị trí
+│   ├── league_table.py          # Bảng xếp hạng + stakes
+│   └── season_replay.py         # Backtest theo từng GW có chip
 ├── data/
 │   ├── players.csv, teams.csv, fixtures.csv, history.csv
-│   ├── cup_fixtures.csv                     # EFL/UCL/UEL/UECL congestion src
-│   ├── fixture_lambdas.csv                  # λ_h, λ_a, cs_{h,a}_p per fixture
-│   ├── season_replay.csv                    # Replay state (CI gate reads this)
-│   ├── .fpl_ci_cache/                       # raw per-GW snapshots
+│   ├── cup_fixtures.csv                     # Nguồn congestion EFL/UCL/UEL/UECL
+│   ├── fixture_lambdas.csv                  # λ_h, λ_a, cs_{h,a}_p theo fixture
+│   ├── season_replay.csv                    # Trạng thái replay (CI gate đọc file này)
 │   ├── xgb_home_goals.json, xgb_away_goals.json
 │   ├── xgb_points_q{10,50,90}_p{1,2,3,4}.json
 │   ├── xgb_minutes_plays.json               # P(plays)
@@ -352,16 +311,16 @@ fpl-ml-manager/
 │   ├── minutes_recalib.json
 │   ├── team_rho.json
 │   └── processed/
-│       ├── lineup.md                    # Weekly human report
-│       ├── squad_snapshot.csv           # Next-RHC state (read by next run)
-│       ├── season_replay.md             # Chip-aware GW-by-GW human report
-│       └── backtest/                    # Preds + calib tables
+│       ├── lineup.md                    # Báo cáo hàng tuần
+│       ├── squad_snapshot.csv           # Trạng thái RHC tiếp theo
+│       ├── season_replay.md             # Báo cáo replay theo GW có chip
+│       └── backtest/                    # Dự đoán + bảng calibration
 ├── docs/
 │   ├── README.md
 │   └── FPL_101.md
 └── .github/workflows/
-    ├── pipeline.yml             # FPL Daily Update — 05:30 + 17:30 UTC daily
-    └── season_replay.yml        # Auto-fires on pipeline success + workflow_dispatch
+    ├── pipeline.yml             # FPL Daily Update — 05:30 + 17:30 UTC hàng ngày
+    └── season_replay.yml        # Tự kích hoạt khi pipeline thành công
 ```
 
 ---
@@ -371,7 +330,7 @@ fpl-ml-manager/
 ### Requirements
 
 - Python 3.11+
-- No GPU — XGBoost CPU fast enough.
+- Không cần GPU — XGBoost CPU đủ nhanh.
 
 ### Local setup
 
@@ -384,46 +343,52 @@ pip install -r requirements.txt
 python src/main.py
 ```
 
-First run trains every artifact. Later runs reuse `data/*.json`, retrain only missing. Output → [data/processed/lineup.md](../data/processed/lineup.md). State → [data/processed/squad_snapshot.csv](../data/processed/squad_snapshot.csv).
+Lần đầu chạy sẽ train toàn bộ artifact. Các lần sau reuse `data/*.json`, chỉ train lại khi thiếu. Output → [data/processed/lineup.md](../data/processed/lineup.md). State → [data/processed/squad_snapshot.csv](../data/processed/squad_snapshot.csv).
+
+### Chạy trên GitHub Actions
+
+1. Push repo lên GitHub
+2. Vào tab **Actions** → chọn **"FPL Daily Update"** → nhấn **"Run workflow"**
+3. Sau khi chạy xong, xem kết quả trong phần **Summary** của workflow run — `lineup.md` được render đẹp ở đó
+
+Tự động chạy: **05:30 + 17:30 UTC** mỗi ngày (tức 12:30 và 00:30 giờ Việt Nam).
 
 ### Recalibration
 
-Auto. `_maybe_recalibrate(...)` walk-forward-retrains when JSONs > `RECALIB_STALE_DAYS` (= 14) or missing. Auto-load via `predict_quantiles` / `predict_minutes`.
+Tự động. `_maybe_recalibrate(...)` chạy walk-forward retrain khi JSON cũ hơn `RECALIB_STALE_DAYS` (= 14) hoặc bị thiếu.
 
-Manual:
+Thủ công:
 
 ```bash
-# Force refresh
+# Buộc refresh
 rm data/points_recalib.json data/minutes_recalib.json
 python src/main.py
 
 # Walk-forward CV
 python src/backtest.py --k 8
 
-# Refit (consumes backtest/*.csv)
+# Refit (dùng backtest/*.csv)
 python src/recalibrate_points.py
 python src/recalibrate_minutes.py
 
-# Audit recalibrated minutes
+# Audit minutes đã calibrate
 python src/backtest.py --k 8 --minutes-recalib data/minutes_recalib.json
 ```
 
 ### Scheduled
 
-[.github/workflows/pipeline.yml](../.github/workflows/pipeline.yml) runs 2×/day 05:30 + 17:30 UTC, 30 min after FPL-CI refresh. Idempotent — commits only when artifacts change. `concurrency: fpl-update` prevents overlap.
-
-[.github/workflows/season_replay.yml](../.github/workflows/season_replay.yml) auto-fires on pipeline success (`workflow_run`). Detects newly fully-finished GW from `fixtures.csv` — replays only when a complete event lands since last run. Manual `workflow_dispatch` always runs. Separate `concurrency: fpl-replay` group so it doesn't race with pipeline pushes; commit step `pull --rebase` retries on reject.
+[.github/workflows/pipeline.yml](../.github/workflows/pipeline.yml) chạy 2 lần/ngày 05:30 + 17:30 UTC, 30 phút sau khi FPL-CI refresh. Idempotent — chỉ commit khi artifact thay đổi. `concurrency: fpl-update` tránh chạy đồng thời.
 
 ---
 
 ## 10. Future Work
 
-1. **Rank-EV via end-of-season MC** — extend `_joint_mc_aggregate` to simulate full remaining-season trajectories per squad/transfer plan; replace MILP points-EV with EO-weighted percentile. Current `lambda_eo` differential tilt is first-order only.
-2. **MIQP risk** — replace diagonal linear $-\nu s$ penalty with full quadratic $x^\top \Sigma x$. Σ obtainable from MC sample draws once exported pairwise. Requires Gurobi/CPLEX/SCIP — CBC is LP-only.
-3. **Result-distribution head** — model W/D/L probs from joint Poisson PMF (with Dixon–Coles τ correction). Would give DEF/GK heads a structural CS-correlated signal beyond marginal `cs_h_p`.
-4. **Regime breaks** — embedding-based detection of new-manager / new-set-piece-taker invalidating rolling features. EMA halflife smooths but doesn't reset.
-5. **Learned chip scheduler** — joint MILP extension. Chip-EV path-dependent on transfer plan + DGW timing; greedy post-processing in [src/chips.py](../src/chips.py) misses interactions.
-6. **Strict walk-forward replay** — `season_replay.py` reuses production heads (trained on full season → mild parameter leakage). Per-GW retrain on `round < G` would yield honest out-of-sample. Cost ~30 sec/GW × 36 ≈ 18 min/run.
+1. **Rank-EV via end-of-season MC** — mở rộng `_joint_mc_aggregate` để mô phỏng toàn bộ trajectory còn lại của mùa giải; thay thế MILP points-EV bằng EO-weighted percentile.
+2. **MIQP risk** — thay diagonal linear $-\nu s$ bằng quadratic đầy đủ $x^\top \Sigma x$. Yêu cầu Gurobi/CPLEX/SCIP — CBC chỉ hỗ trợ LP.
+3. **Result-distribution head** — mô hình xác suất W/D/L từ joint Poisson PMF (với Dixon–Coles τ correction). Cho DEF/GK head tín hiệu CS có cấu trúc tốt hơn.
+4. **Regime breaks** — phát hiện thay đổi HLV / người đá set-piece mới làm vô hiệu rolling features. EMA halflife làm mượt nhưng không reset.
+5. **Learned chip scheduler** — mở rộng MILP. EV chip phụ thuộc vào path transfer plan + thời điểm DGW; greedy post-processing trong [src/chips.py](../src/chips.py) bỏ lỡ các tương tác này.
+6. **Strict walk-forward replay** — `season_replay.py` hiện dùng production heads (train trên toàn mùa → leakage parameter nhẹ). Retrain theo từng GW `round < G` sẽ cho out-of-sample thực sự.
 
 ---
 
@@ -433,28 +398,28 @@ python src/backtest.py --k 8 --minutes-recalib data/minutes_recalib.json
 
 - [XGBoost][ref-xgboost] — Chen & Guestrin, KDD 2016. Backbone.
 - [Regression Quantiles][ref-koenker] — Koenker & Bassett, Econometrica 1978. Pinball loss.
-- [Quantile Curves Without Crossing][ref-chernozhukov] — Chernozhukov, Fernández-Val & Galichon, Econometrica 2010. Constrained alternative to row-sort.
+- [Quantile Curves Without Crossing][ref-chernozhukov] — Chernozhukov, Fernández-Val & Galichon, Econometrica 2010.
 
 ### Ratings
 
-- [Hvattum & Arntzen 2010][ref-hvattum] — Elo → football, bookmaker validation.
-- [538 NBA Elo][ref-538] — MoV multiplier.
+- [Hvattum & Arntzen 2010][ref-hvattum] — Elo → bóng đá, xác nhận với bookmaker.
+- [538 NBA Elo][ref-538] — hệ số MoV.
 
 ### Optimization
 
 - [Hunter, Vielma & Zaman 2016][ref-hvz] — DFS portfolio integer programming.
-- [Mayne MPC 2014][ref-mpc] — RHC canonical reference.
-- [PuLP][ref-pulp] — modeling layer over CBC.
+- [Mayne MPC 2014][ref-mpc] — tài liệu tham khảo chuẩn về RHC.
+- [PuLP][ref-pulp] — lớp modeling trên CBC.
 
 ### Future-work refs
 
-- [Dixon & Coles 1997][ref-dc] — τ low-score correction. Source for §10 result-distribution head.
+- [Dixon & Coles 1997][ref-dc] — τ low-score correction.
 
 ### Data
 
-- [olbauday/FPL-Core-Insights][ref-fpl-ci] — primary. `teams.csv`, `players.csv`, `By Gameweek/GW{n}/{fixtures, playerstats, player_gameweek_stats, playermatchstats}.csv`, `gameweek_summaries.csv`.
-- [FPL Public API][ref-fpl] — live overlay (`bootstrap-static/`). Prices, ownership, status, `chance_of_playing_next_round`.
-- [ClubElo][ref-clubelo] — via FPL-CI `fixtures.csv` (`home_team_elo`, `away_team_elo`).
+- [olbauday/FPL-Core-Insights][ref-fpl-ci] — nguồn dữ liệu chính.
+- [FPL Public API][ref-fpl] — live overlay (giá, ownership, status, `chance_of_playing_next_round`).
+- [ClubElo][ref-clubelo] — qua FPL-CI `fixtures.csv`.
 
 [ref-xgboost]: https://arxiv.org/abs/1603.02754
 [ref-dc]: https://www.ajbuckeconbikesail.net/wkpapers/Airports/MVPoisson/soccer_betting.pdf
@@ -473,7 +438,7 @@ python src/backtest.py --k 8 --minutes-recalib data/minutes_recalib.json
 
 ## Data + Credit
 
-All credit upstream → §11. Subject to provider terms. Public, read-only endpoints/files. Not affiliated with Premier League, ClubElo, FPL-Core-Insights.
+Toàn bộ credit thuộc về các nguồn ở §11. Tuân theo điều khoản của từng nhà cung cấp. Các endpoint/file công khai, chỉ đọc. Không liên kết với Premier League, ClubElo, FPL-Core-Insights.
 
 ---
 
@@ -481,4 +446,4 @@ All credit upstream → §11. Subject to provider terms. Public, read-only endpo
 
 TBD.
 
-> **Note:** FPL API, FPL-CI, ClubElo governed by separate terms.
+> **Lưu ý:** FPL API, FPL-CI, ClubElo được điều chỉnh bởi các điều khoản riêng biệt.
