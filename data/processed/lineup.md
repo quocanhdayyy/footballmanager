@@ -3,7 +3,7 @@
 - **Bank:** £0.0m
 - **Hits:** 0
 - **Squad Value:** £100.0m
-- **XI Expected Points (incl. captain):** 74.2
+- **XI Expected Points (incl. captain):** 74.0
 
 ## Starting XI
 
@@ -14,11 +14,11 @@
 | Castagne | FUL | DEF | 4.3 | 5.8 | 5.8 |  |
 | Danso | TOT | DEF | 4.2 | 5.57 | 5.57 |  |
 | Pedro Porro | TOT | DEF | 5.2 | 5.68 | 5.68 |  |
-| Mavropanos | WHU | DEF | 4.5 | 5.99 | 5.99 |  |
-| Mbeumo | MUN | MID | 8.3 | 5.69 | 5.69 |  |
+| Mavropanos | WHU | DEF | 4.5 | 5.85 | 5.85 |  |
+| Mbeumo | MUN | MID | 8.3 | 5.68 | 5.68 |  |
 | B.Fernandes | MUN | MID | 10.4 | 14.67 | 7.34 | (C) |
 | Haaland | MCI | FWD | 14.7 | 5.58 | 5.58 |  |
-| Bowen | WHU | FWD | 7.8 | 7.12 | 7.12 | (VC) |
+| Bowen | WHU | FWD | 7.8 | 7.05 | 7.05 | (VC) |
 | Taty | WHU | FWD | 5.5 | 5.69 | 5.69 |  |
 
 ## Bench
