@@ -1,8 +1,8 @@
 # GW38 Lineup
 
-- **Bank:** £0.0m
+- **Bank:** £49.3m
 - **Hits:** 0
-- **Squad Value:** £100.0m
+- **Squad Value:** £50.7m
 - **XI Expected Points (incl. captain):** 74.0
 
 ## Starting XI
@@ -10,25 +10,25 @@
 | Name | Team | Pos | Price | XP(1) | XP(H) | Role |
 | --- | --- | --- | --- | --- | --- | --- |
 | Leno | FUL | GK | 5.0 | 6.64 | 6.64 |  |
-| Robinson | FUL | DEF | 4.9 | 5.75 | 5.75 |  |
-| Castagne | FUL | DEF | 4.3 | 5.8 | 5.8 |  |
-| Danso | TOT | DEF | 4.2 | 5.57 | 5.57 |  |
-| Pedro Porro | TOT | DEF | 5.2 | 5.68 | 5.68 |  |
-| Mavropanos | WHU | DEF | 4.5 | 5.85 | 5.85 |  |
-| Mbeumo | MUN | MID | 8.3 | 5.68 | 5.68 |  |
-| B.Fernandes | MUN | MID | 10.4 | 14.67 | 7.34 | (C) |
-| Haaland | MCI | FWD | 14.7 | 5.58 | 5.58 |  |
-| Bowen | WHU | FWD | 7.8 | 7.05 | 7.05 | (VC) |
-| Taty | WHU | FWD | 5.5 | 5.69 | 5.69 |  |
+| Robinson | FUL | DEF | 5.5 | 5.75 | 5.75 |  |
+| Castagne | FUL | DEF | 5.0 | 5.8 | 5.8 |  |
+| Danso | TOT | DEF | 0.4 | 5.57 | 5.57 |  |
+| Pedro Porro | TOT | DEF | 0.5 | 5.68 | 5.68 |  |
+| Mavropanos | WHU | DEF | 0.4 | 5.85 | 5.85 |  |
+| Mbeumo | MUN | MID | 4.5 | 5.68 | 5.68 |  |
+| B.Fernandes | MUN | MID | 5.0 | 14.67 | 7.34 | (C) |
+| Haaland | MCI | FWD | 5.5 | 5.58 | 5.58 |  |
+| Bowen | WHU | FWD | 0.8 | 7.05 | 7.05 | (VC) |
+| Taty | WHU | FWD | 0.6 | 5.69 | 5.69 |  |
 
 ## Bench
 
 | Name | Team | Pos | Price | XP(1) | XP(H) | Role |
 | --- | --- | --- | --- | --- | --- | --- |
-| Lammens | MUN | GK | 5.1 | 6.64 | 6.64 |  |
-| Tavernier | BOU | MID | 5.3 | 3.79 | 3.79 |  |
-| Saka | ARS | MID | 10.0 | 4.96 | 4.96 |  |
-| E.Le Fée | SUN | MID | 4.8 | 4.5 | 4.5 |  |
+| Lammens | MUN | GK | 0.5 | 6.64 | 6.64 |  |
+| Tavernier | BOU | MID | 5.5 | 3.79 | 3.79 |  |
+| Saka | ARS | MID | 6.5 | 4.96 | 4.96 |  |
+| E.Le Fée | SUN | MID | 5.0 | 4.5 | 4.5 |  |
 
 ## Transfers
 
