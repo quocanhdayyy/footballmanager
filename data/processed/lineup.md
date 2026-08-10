@@ -1,8 +1,8 @@
 # GW38 Lineup
 
-- **Bank:** £39.2m
+- **Bank:** £34.7m
 - **Hits:** 0
-- **Squad Value:** £60.8m
+- **Squad Value:** £65.3m
 - **XI Expected Points (incl. captain):** 67.8
 
 ## Starting XI
@@ -13,7 +13,7 @@
 | Robinson | FUL | DEF | 5.5 | 5.09 | 5.09 |  |
 | Pedro Porro | TOT | DEF | 5.5 | 5.77 | 5.77 |  |
 | Castagne | FUL | DEF | 5.0 | 5.07 | 5.07 |  |
-| Van de Ven | TOT | DEF | 0.4 | 5.05 | 5.05 |  |
+| Van de Ven | TOT | DEF | 5.0 | 5.05 | 5.05 |  |
 | Danso | TOT | DEF | 5.5 | 5.68 | 5.68 |  |
 | Tavernier | BOU | MID | 5.5 | 4.75 | 4.75 |  |
 | Saka | ARS | MID | 6.5 | 5.03 | 5.03 |  |
