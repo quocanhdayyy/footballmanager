@@ -1,9 +1,9 @@
 # GW38 Lineup
 
-- **Bank:** £34.7m
+- **Bank:** £34.2m
 - **Hits:** 0
-- **Squad Value:** £65.3m
-- **XI Expected Points (incl. captain):** 65.0
+- **Squad Value:** £65.8m
+- **XI Expected Points (incl. captain):** 64.7
 
 ## Starting XI
 
@@ -12,7 +12,7 @@
 | Leno | FUL | GK | 5.0 | 5.69 | 5.69 |  |
 | Robinson | FUL | DEF | 5.5 | 5.09 | 5.09 |  |
 | Pedro Porro | TOT | DEF | 5.5 | 5.77 | 5.77 |  |
-| Castagne | FUL | DEF | 5.0 | 5.07 | 5.07 |  |
+| Bassey | FUL | DEF | 5.5 | 4.77 | 4.77 |  |
 | Danso | TOT | DEF | 5.5 | 5.68 | 5.68 |  |
 | Van de Ven | TOT | DEF | 5.0 | 5.05 | 5.05 |  |
 | Tavernier | BOU | MID | 5.5 | 4.75 | 4.75 |  |
@@ -32,10 +32,12 @@
 
 ## Transfers
 
-_Hold — no transfer beats a 4-pt hit._
+| Out | In |
+| --- | --- |
+| Castagne | Bassey |
 
 ## Chip Recommendations
 
 - **Triple Captain:** GW38 — Bowen (+7.5 pts)
 - **Bench Boost:** GW38 (+16.4 pts)
-- **Wildcard:** hold (0 suggested transfers, 0 hits)
+- **Wildcard:** hold (1 suggested transfers, 0 hits)
