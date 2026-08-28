@@ -1,8 +1,8 @@
 # GW38 Lineup
 
-- **Bank:** £34.7m
+- **Bank:** £34.8m
 - **Hits:** 0
-- **Squad Value:** £65.3m
+- **Squad Value:** £65.2m
 - **XI Expected Points (incl. captain):** 65.0
 
 ## Starting XI
@@ -16,7 +16,7 @@
 | Van de Ven | TOT | DEF | 5.0 | 5.05 | 5.05 |  |
 | Tavernier | BOU | MID | 5.5 | 4.75 | 4.75 |  |
 | B.Fernandes | MUN | MID | 5.0 | 5.59 | 5.59 |  |
-| Saka | ARS | MID | 6.5 | 5.03 | 5.03 |  |
+| Saka | ARS | MID | 6.4 | 5.03 | 5.03 |  |
 | Haaland | MCI | FWD | 5.5 | 11.37 | 5.68 | (C) |
 | Bowen | WHU | FWD | 0.8 | 6.27 | 6.27 | (VC) |
 | Taty | WHU | FWD | 0.6 | 4.72 | 4.72 |  |
