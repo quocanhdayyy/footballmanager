@@ -1,8 +1,8 @@
 # GW38 Lineup
 
-- **Bank:** £34.8m
+- **Bank:** £30.5m
 - **Hits:** 0
-- **Squad Value:** £65.2m
+- **Squad Value:** £69.5m
 - **XI Expected Points (incl. captain):** 65.0
 
 ## Starting XI
@@ -18,7 +18,7 @@
 | B.Fernandes | MUN | MID | 5.0 | 5.59 | 5.59 |  |
 | Saka | ARS | MID | 6.4 | 5.03 | 5.03 |  |
 | Haaland | MCI | FWD | 5.5 | 11.37 | 5.68 | (C) |
-| Bowen | WHU | FWD | 0.8 | 6.27 | 6.27 | (VC) |
+| Bowen | WHU | FWD | 5.0 | 6.27 | 6.27 | (VC) |
 | Taty | WHU | FWD | 0.6 | 4.72 | 4.72 |  |
 
 ## Bench
