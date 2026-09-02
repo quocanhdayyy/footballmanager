@@ -9,13 +9,13 @@
 
 | Name | Team | Pos | Price | XP(1) | XP(H) | Role |
 | --- | --- | --- | --- | --- | --- | --- |
-| Leno | FUL | GK | 5.0 | 5.69 | 5.69 |  |
+| Leno | FUL | GK | 4.9 | 5.69 | 5.69 |  |
 | Danso | TOT | DEF | 5.5 | 5.68 | 5.68 |  |
 | Pedro Porro | TOT | DEF | 5.5 | 5.77 | 5.77 |  |
 | Van de Ven | TOT | DEF | 5.0 | 5.05 | 5.05 |  |
 | E.Le Fée | SUN | MID | 5.0 | 4.53 | 4.53 |  |
 | Saka | ARS | MID | 6.4 | 5.03 | 5.03 |  |
-| B.Fernandes | MUN | MID | 5.0 | 5.59 | 5.59 |  |
+| B.Fernandes | MUN | MID | 5.1 | 5.59 | 5.59 |  |
 | Tavernier | BOU | MID | 5.5 | 4.75 | 4.75 |  |
 | Haaland | MCI | FWD | 5.5 | 11.37 | 5.68 | (C) |
 | Bowen | WHU | FWD | 5.0 | 6.27 | 6.27 | (VC) |
