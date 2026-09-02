@@ -1,24 +1,24 @@
 # GW38 Lineup
 
-- **Bank:** £30.5m
+- **Bank:** £35.5m
 - **Hits:** 0
-- **Squad Value:** £69.5m
-- **XI Expected Points (incl. captain):** 64.5
+- **Squad Value:** £64.5m
+- **XI Expected Points (incl. captain):** 61.8
 
 ## Starting XI
 
 | Name | Team | Pos | Price | XP(1) | XP(H) | Role |
 | --- | --- | --- | --- | --- | --- | --- |
-| Leno | FUL | GK | 4.9 | 5.69 | 5.69 |  |
-| Danso | TOT | DEF | 5.5 | 5.68 | 5.68 |  |
+| Hermansen | WHU | GK | 0.4 | 4.48 | 4.48 |  |
 | Pedro Porro | TOT | DEF | 5.5 | 5.77 | 5.77 |  |
 | Van de Ven | TOT | DEF | 5.0 | 5.05 | 5.05 |  |
+| Danso | TOT | DEF | 5.5 | 5.68 | 5.68 |  |
 | E.Le Fée | SUN | MID | 5.0 | 4.53 | 4.53 |  |
-| Saka | ARS | MID | 6.4 | 5.03 | 5.03 |  |
-| B.Fernandes | MUN | MID | 5.1 | 5.59 | 5.59 |  |
+| B.Fernandes | MUN | MID | 5.1 | 5.59 | 5.59 | (VC) |
 | Tavernier | BOU | MID | 5.5 | 4.75 | 4.75 |  |
+| Saka | ARS | MID | 6.4 | 5.03 | 5.03 |  |
+| Watkins | AVL | FWD | 4.5 | 4.79 | 4.79 |  |
 | Haaland | MCI | FWD | 5.5 | 11.37 | 5.68 | (C) |
-| Bowen | WHU | FWD | 5.0 | 6.27 | 6.27 | (VC) |
 | Taty | WHU | FWD | 0.6 | 4.72 | 4.72 |  |
 
 ## Bench
@@ -32,10 +32,13 @@
 
 ## Transfers
 
-_Hold — no transfer beats a 4-pt hit._
+| Out | In |
+| --- | --- |
+| Bowen | Watkins |
+| Leno | Hermansen |
 
 ## Chip Recommendations
 
 - **Triple Captain:** GW38 — Haaland (+7.5 pts)
 - **Bench Boost:** GW38 (+16.7 pts)
-- **Wildcard:** hold (0 suggested transfers, 0 hits)
+- **Wildcard:** hold (2 suggested transfers, 0 hits)
