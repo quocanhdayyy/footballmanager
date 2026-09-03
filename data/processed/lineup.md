@@ -32,13 +32,10 @@
 
 ## Transfers
 
-| Out | In |
-| --- | --- |
-| Bowen | Watkins |
-| Leno | Hermansen |
+_Hold — no transfer beats a 4-pt hit._
 
 ## Chip Recommendations
 
 - **Triple Captain:** GW38 — Haaland (+7.5 pts)
 - **Bench Boost:** GW38 (+16.7 pts)
-- **Wildcard:** hold (2 suggested transfers, 0 hits)
+- **Wildcard:** hold (0 suggested transfers, 0 hits)
