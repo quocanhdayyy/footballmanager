@@ -3,7 +3,7 @@
 - **Bank:** £40.7m
 - **Hits:** 0
 - **Squad Value:** £59.3m
-- **XI Expected Points (incl. captain):** 62.3
+- **XI Expected Points (incl. captain):** 64.8
 
 ## Starting XI
 
@@ -18,7 +18,7 @@
 | M.Fernandes | WHU | MID | 0.6 | 4.74 | 4.74 |  |
 | B.Fernandes | MUN | MID | 5.1 | 5.59 | 5.59 | (VC) |
 | Watkins | AVL | FWD | 4.5 | 4.79 | 4.79 |  |
-| Haaland | MCI | FWD | 5.4 | 11.37 | 5.68 | (C) |
+| Haaland | MCI | FWD | 5.4 | 13.86 | 6.93 | (C) |
 | Taty | WHU | FWD | 0.6 | 4.72 | 4.72 |  |
 
 ## Bench
@@ -32,12 +32,10 @@
 
 ## Transfers
 
-| Out | In |
-| --- | --- |
-| Tavernier | M.Fernandes |
+_Hold — no transfer beats a 4-pt hit._
 
 ## Chip Recommendations
 
-- **Triple Captain:** GW38 — Haaland (+7.5 pts)
+- **Triple Captain:** GW38 — Haaland (+8.6 pts)
 - **Bench Boost:** GW38 (+17.2 pts)
-- **Wildcard:** hold (1 suggested transfers, 0 hits)
+- **Wildcard:** hold (0 suggested transfers, 0 hits)
