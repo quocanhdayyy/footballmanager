@@ -1,8 +1,8 @@
 # GW38 Lineup
 
-- **Bank:** £40.9m
+- **Bank:** £45.2m
 - **Hits:** 0
-- **Squad Value:** £59.1m
+- **Squad Value:** £54.8m
 - **XI Expected Points (incl. captain):** 64.8
 
 ## Starting XI
@@ -27,15 +27,17 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | Lammens | MUN | GK | 0.5 | 3.82 | 3.82 |  |
 | Truffert | BOU | DEF | 5.0 | 4.45 | 4.45 |  |
+| Rayan | BOU | MID | 0.5 | 4.53 | 4.53 |  |
 | Mbeumo | MUN | MID | 4.5 | 4.39 | 4.39 |  |
-| E.Le Fée | SUN | MID | 4.9 | 4.53 | 4.53 |  |
 
 ## Transfers
 
-_Hold — no transfer beats a 4-pt hit._
+| Out | In |
+| --- | --- |
+| E.Le Fée | Rayan |
 
 ## Chip Recommendations
 
 - **Triple Captain:** GW38 — Haaland (+8.6 pts)
 - **Bench Boost:** GW38 (+17.2 pts)
-- **Wildcard:** hold (0 suggested transfers, 0 hits)
+- **Wildcard:** hold (1 suggested transfers, 0 hits)
