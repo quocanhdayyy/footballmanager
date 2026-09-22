@@ -1,8 +1,8 @@
 # GW38 Lineup
 
-- **Bank:** £45.5m
+- **Bank:** £45.4m
 - **Hits:** 0
-- **Squad Value:** £54.5m
+- **Squad Value:** £54.6m
 - **XI Expected Points (incl. captain):** 64.8
 
 ## Starting XI
@@ -16,7 +16,7 @@
 | Pedro Porro | TOT | DEF | 5.4 | 5.77 | 5.77 |  |
 | Saka | ARS | MID | 6.2 | 5.03 | 5.03 |  |
 | M.Fernandes | WHU | MID | 0.6 | 4.74 | 4.74 |  |
-| B.Fernandes | MUN | MID | 5.2 | 5.59 | 5.59 | (VC) |
+| B.Fernandes | MUN | MID | 5.3 | 5.59 | 5.59 | (VC) |
 | Watkins | AVL | FWD | 4.5 | 4.79 | 4.79 |  |
 | Haaland | MCI | FWD | 5.4 | 13.86 | 6.93 | (C) |
 | Taty | WHU | FWD | 0.6 | 4.72 | 4.72 |  |
