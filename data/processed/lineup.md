@@ -1,8 +1,8 @@
 # GW38 Lineup
 
-- **Bank:** £45.4m
+- **Bank:** £45.3m
 - **Hits:** 0
-- **Squad Value:** £54.6m
+- **Squad Value:** £54.7m
 - **XI Expected Points (incl. captain):** 64.8
 
 ## Starting XI
@@ -10,7 +10,7 @@
 | Name | Team | Pos | Price | XP(1) | XP(H) | Role |
 | --- | --- | --- | --- | --- | --- | --- |
 | Hermansen | WHU | GK | 0.4 | 4.48 | 4.48 |  |
-| Robinson | FUL | DEF | 5.5 | 5.09 | 5.09 |  |
+| Robinson | FUL | DEF | 5.6 | 5.09 | 5.09 |  |
 | Danso | TOT | DEF | 5.4 | 5.68 | 5.68 |  |
 | Van de Ven | TOT | DEF | 4.8 | 5.05 | 5.05 |  |
 | Pedro Porro | TOT | DEF | 5.4 | 5.77 | 5.77 |  |
