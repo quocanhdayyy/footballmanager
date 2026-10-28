@@ -3,7 +3,7 @@
 - **Bank:** £45.5m
 - **Hits:** 0
 - **Squad Value:** £54.5m
-- **XI Expected Points (incl. captain):** 64.8
+- **XI Expected Points (incl. captain):** 64.3
 
 ## Starting XI
 
@@ -14,7 +14,7 @@
 | Danso | TOT | DEF | 5.3 | 5.68 | 5.68 |  |
 | Van de Ven | TOT | DEF | 4.8 | 5.05 | 5.05 |  |
 | Pedro Porro | TOT | DEF | 5.4 | 5.77 | 5.77 |  |
-| Saka | ARS | MID | 6.2 | 5.03 | 5.03 |  |
+| Rayan | BOU | MID | 0.5 | 4.53 | 4.53 |  |
 | M.Fernandes | WHU | MID | 0.6 | 4.74 | 4.74 |  |
 | B.Fernandes | MUN | MID | 5.3 | 5.59 | 5.59 | (VC) |
 | Watkins | AVL | FWD | 4.5 | 4.79 | 4.79 |  |
@@ -27,7 +27,7 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | Lammens | MUN | GK | 0.5 | 3.82 | 3.82 |  |
 | Truffert | BOU | DEF | 5.0 | 4.45 | 4.45 |  |
-| Rayan | BOU | MID | 0.5 | 4.53 | 4.53 |  |
+| Saka | ARS | MID | 6.2 | 4.26 | 4.26 |  |
 | Mbeumo | MUN | MID | 4.5 | 4.39 | 4.39 |  |
 
 ## Transfers
@@ -37,5 +37,5 @@ _Hold — no transfer beats a 4-pt hit._
 ## Chip Recommendations
 
 - **Triple Captain:** GW38 — Haaland (+8.6 pts)
-- **Bench Boost:** GW38 (+17.2 pts)
+- **Bench Boost:** GW38 (+16.9 pts)
 - **Wildcard:** hold (0 suggested transfers, 0 hits)
