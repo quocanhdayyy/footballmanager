@@ -1,8 +1,8 @@
 # GW38 Lineup
 
-- **Bank:** £44.7m
+- **Bank:** £44.8m
 - **Hits:** 0
-- **Squad Value:** £55.3m
+- **Squad Value:** £55.2m
 - **XI Expected Points (incl. captain):** 64.8
 
 ## Starting XI
@@ -15,7 +15,7 @@
 | Danso | TOT | DEF | 5.3 | 5.68 | 5.68 |  |
 | Van de Ven | TOT | DEF | 4.8 | 5.05 | 5.05 |  |
 | Saka | ARS | MID | 6.2 | 5.03 | 5.03 |  |
-| B.Fernandes | MUN | MID | 5.3 | 5.59 | 5.59 | (VC) |
+| B.Fernandes | MUN | MID | 5.2 | 5.59 | 5.59 | (VC) |
 | Tavernier | BOU | MID | 5.4 | 4.75 | 4.75 |  |
 | M.Fernandes | WHU | MID | 0.6 | 4.74 | 4.74 |  |
 | Watkins | AVL | FWD | 4.5 | 4.79 | 4.79 |  |
