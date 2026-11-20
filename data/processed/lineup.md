@@ -1,8 +1,8 @@
 # GW38 Lineup
 
-- **Bank:** £40.0m
+- **Bank:** £40.7m
 - **Hits:** 0
-- **Squad Value:** £60.0m
+- **Squad Value:** £59.3m
 - **XI Expected Points (incl. captain):** 65.0
 
 ## Starting XI
@@ -28,14 +28,16 @@
 | Hermansen | WHU | GK | 0.4 | 4.48 | 4.48 |  |
 | Truffert | BOU | DEF | 4.9 | 4.45 | 4.45 |  |
 | Rayan | BOU | MID | 0.5 | 4.53 | 4.53 |  |
-| Tavernier | BOU | MID | 5.4 | 4.05 | 4.05 |  |
+| Cherki | MCI | MID | 4.7 | 4.28 | 4.28 |  |
 
 ## Transfers
 
-_Hold — no transfer beats a 4-pt hit._
+| Out | In |
+| --- | --- |
+| Tavernier | Cherki |
 
 ## Chip Recommendations
 
 - **Triple Captain:** GW38 — Haaland (+8.6 pts)
-- **Bench Boost:** GW38 (+17.5 pts)
-- **Wildcard:** hold (0 suggested transfers, 0 hits)
+- **Bench Boost:** GW38 (+17.7 pts)
+- **Wildcard:** hold (1 suggested transfers, 0 hits)
